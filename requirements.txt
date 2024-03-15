@@ -1,0 +1,2 @@
+slack-sdk>=3,<4
+slackeventsapi>=3,<4
