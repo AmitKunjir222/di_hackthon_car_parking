@@ -1,7 +1,7 @@
 import mysql.connector
 
 available_parking_slots = ['P1', 'P2', 'P3', 'P4']
-admin_serial_number = [4]
+admin_serial_number = [6]
 
 
 # Function to establish a connection to the MySQL database
@@ -59,17 +59,14 @@ def update_parking_status_empty_to_occupied(connection, employee_name, Parking_S
     try:
         cursor = connection.cursor()
         Parking_Position = ''
-        empty_slot_count, empty_Parking_Slot_Number, occupied_slot_count, occupied_Parking_Slot_Number = empty_occupied_parking_slot_info(
-            connection)
+        empty_slot_count, empty_Parking_Slot_Number, occupied_slot_count, occupied_Parking_Slot_Number = empty_occupied_parking_slot_info(connection)
 
         if Parking_Slot_Number not in available_parking_slots:
-            return "Please enter correct parking slot number. Valid parking slots are {}".format(
-                str(available_parking_slots))
+            return "Please enter correct parking slot number. Valid parking slots are {}".format(str(available_parking_slots))
         elif empty_slot_count == 0:
             return "Parking is full now. Please use other alternatives."
         elif Parking_Slot_Number in occupied_Parking_Slot_Number:
-            return "This parking slot {} is used by another employee.\nUse below available parking slots \n {}".format(
-                Parking_Slot_Number, str(empty_Parking_Slot_Number))
+            return "This parking slot {} is used by another employee.\nUse below available parking slots \n {}".format(Parking_Slot_Number, str(empty_Parking_Slot_Number))
 
         query = "SELECT Employee_Name,Serial_Number from Employee WHERE Employee_Name = \'" + employee_name + "\';"
         cursor.execute(query)
@@ -94,8 +91,8 @@ def update_parking_status_empty_to_occupied(connection, employee_name, Parking_S
 
         else:
             query = "UPDATE Parking_Slots SET Status = 'occupied', Arrival_time=NOW(),Out_time=null, Parking_Slot_Number = %s,Parking_Position=%s WHERE Serial_Number = %s;"
-            print("park2 {}".format(query))
             data = (Parking_Slot_Number, Parking_Position, Serial_Number)
+            print("park2 {}".format(query))
             cursor.execute(query, data)
             return f"{employee_name} has parked vehicle in {Parking_Slot_Number}"
 
@@ -135,9 +132,9 @@ def update_parking_status_occupied_to_empty(connection, employee_name, Parking_S
                     Status_p2 = row[4]
                 if Status_p2 == 'occupied':
                     if admin_passed_employee_name is not None:
-                        return f"{employee_name_p2} Please unpark your vehicle so that {admin_passed_employee_name} can unpark from parking slot {Parking_Slot_Number_p2}"
+                        return f"{employee_name_p2} Please unpark your vehicle from {Parking_Slot_Number_p2} so that {admin_passed_employee_name} can unpark from parking slot {Parking_Slot_Number}"
                     else:
-                        return f"{employee_name_p2} Please unpark your vehicle so that {employee_name} can unpark from parking slot {Parking_Slot_Number_p2}"
+                        return f"{employee_name_p2} Please unpark your vehicle from {Parking_Slot_Number_p2} so that {employee_name} can unpark from parking slot {Parking_Slot_Number}"
         elif Parking_Slot_Number == "P3":
             query = "SELECT e.Employee_Name, e.Serial_Number, ps.Parking_Slot_Number, ps.Parking_Position, ps.Status from Employee e JOIN Parking_Slots ps on e.Serial_Number = ps.Serial_Number where Parking_Slot_Number='P4';"
             cursor.execute(query)
@@ -151,9 +148,9 @@ def update_parking_status_occupied_to_empty(connection, employee_name, Parking_S
                     Status_p4 = row[4]
                 if Status_p4 == 'occupied':
                     if admin_passed_employee_name is not None:
-                        return f"{employee_name_p4} Please unpark your vehicle so that {admin_passed_employee_name} can unpark from parking slot {Parking_Slot_Number_p4}"
+                        return f"{employee_name_p4} Please unpark your vehicle from {Parking_Slot_Number_p4} so that {admin_passed_employee_name} can unpark from parking slot {Parking_Slot_Number}"
                     else:
-                        return f"{employee_name_p4} Please unpark your vehicle so that {employee_name} can unpark from parking slot {Parking_Slot_Number_p4}"
+                        return f"{employee_name_p4} Please unpark your vehicle from {Parking_Slot_Number_p4} so that {employee_name} can unpark from parking slot {Parking_Slot_Number}"
 
             # employee_car[employee_name] = (serial_number, parking_slot_number)
             # employee_car.update{"employee_name":employee_name,"Serial_Number":Serial_Number,"Parking_Slot_Number":Parking_Slot_Number,"Parking_Position":Parking_Position, "Status":Status }
@@ -184,7 +181,7 @@ def update_parking_status_occupied_to_empty(connection, employee_name, Parking_S
 
                 cursor.execute(query)
                 cursor.fetchall()
-                return f"{employee_name} has un-parked vehicle from {Parking_Slot_Number} slot. Bye Bye"
+                return f"{employee_name} has un-parked vehicle from {Parking_Slot_Number} slot. Drive Safe :blue_car:"
 
     except mysql.connector.Error as e:
         print("Error updating parking status:", e)
@@ -239,22 +236,30 @@ def empty_occupied_parking_slot_info(connection):
 
 
 # Function to fetch employee details from car number
-def fetch_car_details(connection, car_no):
+def fetch_car_details(connection, car_no, give_dict = False):
     try:
         cursor = connection.cursor()
 
-        query = "SELECT Employee_Name, Team, Floor from bidder.Employee where (Car1 = \'" + car_no + "\' OR Car2 = \'" + car_no + "\');"
+        query = "SELECT Employee_Name, Team, Floor,MobileNo from bidder.Employee where (Car1 = \'" + car_no + "\' OR Car2 = \'" + car_no + "\');"
         cursor.execute(query)
         data = cursor.fetchall()
-
+        car_details = {}
         if len(data) > 0:
             for row in data:
                 employee_name = row[0]
                 team = row[1]
                 floor = row[2]
-            return "Car Details for {}\nEmployee Name - {}\nTeam - {}\nFloor - {}".format(car_no, employee_name, team, floor)
+                mobile = row[3]
+                if give_dict:
+                    car_details.update({'employee_name': employee_name})
+                    car_details.update({'team': team})
+                    car_details.update({'floor': floor})
+                    car_details.update({'mobile': mobile})
+                    return car_details
+
+            return " Car Details for {}\n\nEmployee Name - {}\nTeam - {}\nFloor - {}\nMobile No - {}".format(car_no, employee_name, team, floor, mobile)
         else:
-            return "Car {} doesn't belong to DI employee".format(car_no)
+            return " Car {} doesn't belong to DI employee".format(car_no)
 
     except mysql.connector.Error as e:
         print("Error while fetching fetching car details:", e)
@@ -262,3 +267,28 @@ def fetch_car_details(connection, car_no):
     finally:
         print("Car details fetched successfully")
         connection.commit()
+
+
+# Function to fetch employee-car details
+# Function to fetch employee-car details
+def get_employee_and_car_details(connection):
+    try:
+        cursor = connection.cursor()
+        query = "SELECT e.Employee_Name, e.Team, e.Floor, COALESCE(e.Car1, 'NA') AS Car, e.MobileNo, COALESCE(ps.Parking_Slot_Number, 'NA') AS Parking_Slot_Number,ps.Status FROM Employee e JOIN Parking_Slots ps ON e.Serial_Number = ps.Serial_Number;"
+        cursor.execute(query)
+        data = cursor.fetchall()
+        car_employee_dict = {}
+        for row in data:
+            employee_name = row[0]
+            team = row[1]
+            floor = row[2]
+            car_no = row[3]
+            mobileno = row[4]
+            Parking_Slot_Number = row[5]
+            Status = row[6]
+            car_employee_dict.update({row: {"employee_name": employee_name, "car_no": car_no, "mobileno": mobileno,"Parking_Slot_Number": Parking_Slot_Number, "Status": Status}})
+        print("Car employee details {}".format(car_employee_dict))
+        return car_employee_dict
+
+    except mysql.connector.Error as e:
+        print("Error while fetching fetching car-employee details:", e)
