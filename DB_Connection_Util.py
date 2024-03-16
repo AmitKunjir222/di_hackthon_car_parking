@@ -8,10 +8,10 @@ admin_serial_number = [6]
 def connect_to_database():
     try:
         connection = mysql.connector.connect(
-            host="mysql1-dev-useast.deepintent.com",
-            user="tejas.jain@deepintent.com",
-            password="QzUDDkYpnzHKnasjEh",
-            database="bidder"  # Assuming your database name is CarPark
+            host="host_name",
+            user="user_name",
+            password="password",
+            database="parking"  # Assuming your database name is CarPark
         )
         print("Connected to the database")
         return connection
@@ -154,7 +154,7 @@ def update_parking_status_occupied_to_empty(connection, employee_name, Parking_S
 
             # employee_car[employee_name] = (serial_number, parking_slot_number)
             # employee_car.update{"employee_name":employee_name,"Serial_Number":Serial_Number,"Parking_Slot_Number":Parking_Slot_Number,"Parking_Position":Parking_Position, "Status":Status }
-        query = "SELECT e.Employee_Name,e.Serial_Number,ps.Parking_Slot_Number from Employee e JOIN bidder.Parking_Slots ps ON e.Serial_Number = ps.Serial_Number WHERE Employee_Name = \'" + employee_name + "\';"
+        query = "SELECT e.Employee_Name,e.Serial_Number,ps.Parking_Slot_Number from Employee e JOIN Parking_Slots ps ON e.Serial_Number = ps.Serial_Number WHERE Employee_Name = \'" + employee_name + "\';"
         print("Emp1 {}".format(query))
         cursor.execute(query)
         data = cursor.fetchall()
@@ -240,7 +240,7 @@ def fetch_car_details(connection, car_no, give_dict = False):
     try:
         cursor = connection.cursor()
 
-        query = "SELECT Employee_Name, Team, Floor,MobileNo from bidder.Employee where (Car1 = \'" + car_no + "\' OR Car2 = \'" + car_no + "\');"
+        query = "SELECT Employee_Name, Team, Floor,MobileNo from Employee where (Car1 = \'" + car_no + "\' OR Car2 = \'" + car_no + "\');"
         cursor.execute(query)
         data = cursor.fetchall()
         car_details = {}
