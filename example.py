@@ -256,8 +256,10 @@ def park_command(ack, client, command, body):
     print("Connection {}", format(connection))
     message = ''
     if connection:
-        if arguments:
+        if len(arguments) == 1:
             message = update_parking_status_empty_to_occupied(connection, username, Parking_Slot_Number=arguments[0])
+        elif len(arguments) == 2:
+            message = update_parking_status_empty_to_occupied(connection, username, Parking_Slot_Number=arguments[0], admin_passed_employee_name=arguments[1])
         else:
             print("No arguments provided")
         print("Inside park")
@@ -292,8 +294,10 @@ def unpark_command(ack, client, command, body):
     print("Connection {}", format(connection))
     message = ''
     if connection:
-        if arguments:
+        if len(arguments) == 1:
             message = update_parking_status_occupied_to_empty(connection, username, Parking_Slot_Number=arguments[0])
+        elif len(arguments) == 2:
+            message = update_parking_status_occupied_to_empty(connection, username, Parking_Slot_Number=arguments[0], admin_passed_employee_name=arguments[1])
         else:
             print("No arguments provided")
         print("Inside park")
