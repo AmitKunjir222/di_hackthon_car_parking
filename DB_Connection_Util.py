@@ -13,7 +13,7 @@ def connect_to_database():
             password="password",
             database="parking"  # Assuming your database name is CarPark
         )
-        print("Connected to the database")
+        print("Connected to the database it")
         return connection
     except mysql.connector.Error as e:
         print("Error connecting to the database:", e)
