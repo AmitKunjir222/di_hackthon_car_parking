@@ -24,4 +24,3 @@
 - [ ] I have mentioned Prod Bug JIRA ID in commit message (if PR is for Prod Bug Automation).
 - [ ] I have mentioned Sprint Automation Sub-task's JIRA ID in commit message (if PR is for Sprint Automation).
 - [ ] I have added the test cases count impacted/added/fixed.
-- [ ] I have verified the impact on all public APIs
